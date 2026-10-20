@@ -3,198 +3,142 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TashFix — панель</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>TashFix</title>
+<script>
+try{var t=localStorage.getItem('tf_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}
+</script>
+<style>
+:root{--bg:#fafaf9;--card:#fff;--tx:#18181b;--mut:#71717a;--bd:#e7e5e4;--ac:#18181b;--acx:#fff;--hov:#f5f5f4;--danger:#dc2626;
+--c-new:#a1a1aa;--c-review:#d97706;--c-in_progress:#2563eb;--c-resolved:#16a34a}
+[data-theme=dark]{--bg:#0b0b0c;--card:#141416;--tx:#fafafa;--mut:#a1a1aa;--bd:#27272a;--ac:#fafafa;--acx:#0b0b0c;--hov:#1c1c1f;--danger:#f87171}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--bd);background:var(--bg);position:sticky;top:0;z-index:5}
+.nav{display:flex;align-items:center;gap:24px;height:56px}.logo{font-weight:700;letter-spacing:-.02em}
+.nav a.l{color:var(--mut);font-size:14px}.nav a.l.on,.nav a.l:hover{color:var(--tx)}.sp{flex:1}
+main{padding:32px 0 64px}h1{font-size:24px;letter-spacing:-.02em;margin:0 0 24px}h3{font-size:14px;margin:0 0 16px;color:var(--mut);font-weight:500}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px}
+.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1fr 1fr}
+@media(max-width:760px){.g4{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}.nav{gap:16px}}
+.stat .n{font-size:32px;font-weight:700;letter-spacing:-.03em}.stat .t{font-size:13px;color:var(--mut);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--c,var(--mut));display:inline-block;flex:none}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.btn{font:inherit;font-size:14px;border:1px solid var(--ac);background:var(--ac);color:var(--acx);border-radius:10px;padding:8px 16px;cursor:pointer}
+.btn:disabled{opacity:.5}.btn.ghost{background:none;color:var(--tx);border-color:var(--bd)}.btn.danger{background:none;color:var(--danger);border-color:var(--danger)}
+input,select,textarea{font:inherit;font-size:14px;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--mut)}
+.bar-row{display:grid;grid-template-columns:140px 1fr 32px;gap:12px;align-items:center;font-size:13px;margin-bottom:10px}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--hov)}.bar i{display:block}
+.bar-row b{text-align:right;font-weight:500}.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--mut)}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:16px}@media(max-width:760px){.filters{grid-template-columns:1fr}}
+.tw{overflow-x:auto;padding:0}table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:500;color:var(--mut);font-size:12px;padding:12px 16px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:14px 16px;border-bottom:1px solid var(--bd);vertical-align:top}tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--hov)}.mut{color:var(--mut)}.sm{font-size:13px}
+.err{color:var(--danger);font-size:14px;margin:8px 0}.ok{color:var(--c-resolved);font-size:14px;margin:8px 0}
+.back{font-size:14px;color:var(--mut);display:inline-block;margin-bottom:16px}.stack>*+*{margin-top:12px}
+.hist{list-style:none;margin:0;padding:0}.hist li{padding:0 0 14px 16px;border-left:1px solid var(--bd);position:relative}
+.hist li:before{content:"";position:absolute;left:-4px;top:7px;width:7px;height:7px;border-radius:50%;background:var(--c,var(--mut))}
+img.ph{max-width:100%;max-height:360px;border-radius:10px;border:1px solid var(--bd)}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.login form{width:100%;max-width:340px}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body>
 <div id="app"></div>
 <script>
-// ====== НАСТРОЙКА: адрес твоего бэкенда на Render (без слэша в конце) ======
+// ===== адрес бэкенда на Render (без слэша в конце) =====
 const API = 'https://tashfix-0.onrender.com';
-// ===========================================================================
+// ======================================================
+const DISTRICTS={almazar:'Алмазарский',bektemir:'Бектемирский',mirabad:'Мирабадский',mirzo_ulugbek:'Мирзо-Улугбекский',sergeli:'Сергелийский',uchtepa:'Учтепинский',chilanzar:'Чиланзарский',shaykhontohur:'Шайхантахурский',yunusabad:'Юнусабадский',yakkasaray:'Яккасарайский',yashnabad:'Яшнабадский',yangihayot:'Янгихаётский'};
+const TYPES={trash:'🗑 Урна / мусор',light:'💡 Фонарь',road:'🕳 Яма / дорога',playground:'🛝 Площадка',water:'💧 Вода',other:'⚠️ Другое'};
+const ST={new:'Новая',review:'На проверке',in_progress:'В работе',resolved:'Решена'};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>new Date(d).toLocaleString('ru-RU',{dateStyle:'short',timeStyle:'short'});
+const pill=s=>`<span class="pill" style="--c:var(--c-${s})"><i class="dot"></i>${ST[s]}</span>`;
+const sid=i=>String(i).slice(-6);
+const opts=(m,sel='')=>Object.entries(m).map(([k,v])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(v)}</option>`).join('');
+const tok=()=>{try{return localStorage.getItem('tf_token')}catch(e){return null}};
+function logout(){try{localStorage.removeItem('tf_token')}catch(e){}location.hash='';route()}
+function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('tf_theme',t)}catch(e){}$('th').textContent=t==='dark'?'☀':'☾'}
 
-const DISTRICTS = {
-  almazar:'Алмазарский', bektemir:'Бектемирский', mirabad:'Мирабадский', mirzo_ulugbek:'Мирзо-Улугбекский',
-  sergeli:'Сергелийский', uchtepa:'Учтепинский', chilanzar:'Чиланзарский', shaykhontohur:'Шайхантахурский',
-  yunusabad:'Юнусабадский', yakkasaray:'Яккасарайский', yashnabad:'Яшнабадский', yangihayot:'Янгихаётский'
-};
-const TYPES = {
-  trash:'🗑 Урна / мусор', light:'💡 Фонарь', road:'🕳 Яма / дорога',
-  playground:'🛝 Площадка', water:'💧 Вода', other:'⚠️ Другое'
-};
-const STATUSES = {
-  new:['🆕 Новая','bg-slate-200 text-slate-700'],
-  review:['🔍 На проверке','bg-amber-100 text-amber-800'],
-  in_progress:['🛠 В работе','bg-blue-100 text-blue-800'],
-  resolved:['✅ Решена','bg-green-100 text-green-800']
-};
-
-const $ = (id) => document.getElementById(id);
-const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
-const badge = (s) => `<span class="px-2 py-0.5 rounded-full text-xs font-medium ${STATUSES[s][1]}">${STATUSES[s][0]}</span>`;
-const sid = (id) => String(id).slice(-6);
-const errBox = (m) => `<div class="p-3 rounded bg-red-50 text-red-700 text-sm">${esc(m)}</div>`;
-const opts = (map, sel = '') => Object.entries(map).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${esc(Array.isArray(v) ? v[0] : v)}</option>`).join('');
-
-const getToken = () => localStorage.getItem('tf_token');
-function logout() { localStorage.removeItem('tf_token'); location.hash = ''; route(); }
-
-async function api(path, options = {}, raw = false) {
-  const res = await fetch(API + path, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...(getToken() ? { Authorization: 'Bearer ' + getToken() } : {}) }
-  });
-  if (res.status === 401 && path !== '/api/auth/login') { logout(); throw new Error('Сессия истекла, войдите снова'); }
-  if (raw) { if (!res.ok) throw new Error('Ошибка ' + res.status); return res.blob(); }
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Ошибка ' + res.status);
-  return data;
+async function api(path,o={},blob=false){
+  const r=await fetch(API+path,{...o,headers:{'Content-Type':'application/json',...(tok()?{Authorization:'Bearer '+tok()}:{})}});
+  if(r.status===401&&path!=='/api/auth/login'){logout();throw new Error('Сессия истекла')}
+  if(blob){if(!r.ok)throw new Error('Ошибка '+r.status);return r.blob()}
+  const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Ошибка '+r.status);return d;
 }
 
-// ---------- логин ----------
-function viewLogin() {
-  $('app').innerHTML = `
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <form id="lf" class="bg-white rounded-xl shadow p-6 w-full max-w-sm space-y-4">
-      <h1 class="text-xl font-bold">TashFix · панель</h1>
-      <input id="u" class="w-full border rounded px-3 py-2" placeholder="Логин" autocomplete="username" required>
-      <input id="p" type="password" class="w-full border rounded px-3 py-2" placeholder="Пароль" autocomplete="current-password" required>
-      <div id="le"></div>
-      <button class="w-full bg-slate-900 text-white rounded py-2 font-medium">Войти</button>
-    </form>
-  </div>`;
-  $('lf').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button'); btn.disabled = true; btn.textContent = 'Вход… (сервер может просыпаться)';
-    try {
-      const r = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: $('u').value, password: $('p').value }) });
-      localStorage.setItem('tf_token', r.token); location.hash = '#/'; route();
-    } catch (err) { $('le').innerHTML = errBox(err.message); btn.disabled = false; btn.textContent = 'Войти'; }
-  };
+function viewLogin(){
+  $('app').innerHTML=`<div class="login"><form id="lf" class="stack"><div class="logo" style="font-size:22px;margin-bottom:8px">TashFix</div>
+  <input id="u" placeholder="Логин" autocomplete="username" required><input id="p" type="password" placeholder="Пароль" autocomplete="current-password" required>
+  <div id="le"></div><button class="btn" style="width:100%">Войти</button></form></div>`;
+  $('lf').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;b.textContent='Вход…';
+    try{const r=await api('/api/auth/login',{method:'POST',body:JSON.stringify({username:$('u').value,password:$('p').value})});
+      localStorage.setItem('tf_token',r.token);location.hash='#/';route()}
+    catch(x){$('le').innerHTML=`<div class="err">${esc(x.message)}</div>`;b.disabled=false;b.textContent='Войти'}};
 }
 
-// ---------- каркас ----------
-function shell() {
-  $('app').innerHTML = `
-  <header class="bg-slate-900 text-white">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-6">
-      <b>TashFix</b>
-      <a href="#/" class="text-sm hover:underline">Дашборд</a>
-      <a href="#/problems" class="text-sm hover:underline">Проблемы</a>
-      <button id="lo" class="ml-auto text-sm hover:underline">Выйти</button>
-    </div>
-  </header>
-  <main id="main" class="max-w-6xl mx-auto p-4"><p class="text-slate-500">Загрузка…</p></main>`;
-  $('lo').onclick = logout;
+function shell(h){
+  const dark=document.documentElement.dataset.theme==='dark';
+  $('app').innerHTML=`<header><div class="wrap nav"><span class="logo">TashFix</span>
+  <a class="l ${h==='/'?'on':''}" href="#/">Обзор</a><a class="l ${h!=='/'?'on':''}" href="#/problems">Жалобы</a><span class="sp"></span>
+  <button class="btn ghost" id="th" style="padding:6px 12px">${dark?'☀':'☾'}</button><button class="btn ghost" id="lo" style="padding:6px 12px">Выйти</button></div></header>
+  <main class="wrap" id="main"></main>`;
+  $('th').onclick=toggleTheme;$('lo').onclick=logout;
 }
 
-// ---------- дашборд ----------
-async function viewDashboard() {
-  const s = await api('/api/stats');
-  const card = (t, n, c) => `<div class="bg-white rounded-xl shadow p-4"><div class="text-sm text-slate-500">${t}</div><div class="text-3xl font-bold ${c}">${n}</div></div>`;
-  $('main').innerHTML = `
-    <h2 class="text-xl font-bold mb-4">Статистика</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      ${card('Всего', s.total, '')}${card('Активные (новые + в работе)', s.active, 'text-blue-700')}
-      ${card('На проверке', s.review, 'text-amber-600')}${card('Решено', s.resolved, 'text-green-600')}
-    </div>
-    <a href="#/problems" class="inline-block mt-6 bg-slate-900 text-white rounded px-4 py-2 text-sm">Все проблемы →</a>`;
+async function viewDashboard(){
+  const [s,rows]=await Promise.all([api('/api/stats'),api('/api/problems')]);
+  const card=(t,n,c)=>`<div class="card stat"><div class="t" style="--c:${c||'var(--mut)'}"><i class="dot"></i>${t}</div><div class="n">${n}</div></div>`;
+  const by={};rows.forEach(p=>{const v=by[p.district]||(by[p.district]={new:0,review:0,in_progress:0,resolved:0,t:0});v[p.status]++;v.t++});
+  const list=Object.entries(by).sort((a,b)=>b[1].t-a[1].t),max=list.length?list[0][1].t:1;
+  const bars=list.map(([d,v])=>`<div class="bar-row"><span>${esc(DISTRICTS[d]||d)}</span><div class="bar" style="width:${v.t/max*100}%">${Object.keys(ST).map(k=>v[k]?`<i style="flex:${v[k]};background:var(--c-${k})" title="${ST[k]}: ${v[k]}"></i>`:'').join('')}</div><b>${v.t}</b></div>`).join('');
+  $('main').innerHTML=`<h1>Обзор</h1><div class="grid g4">${card('Всего',s.total)}${card('Новые',s.byStatus.new,'var(--c-new)')}${card('В работе',s.byStatus.in_progress,'var(--c-in_progress)')}${card('Решено',s.resolved,'var(--c-resolved)')}</div>
+  <div class="card" style="margin-top:16px"><h3>Жалобы по районам и статусам</h3>${bars||'<p class="mut">Пока нет данных</p>'}
+  <div class="legend">${Object.keys(ST).map(k=>`<span class="pill" style="--c:var(--c-${k})"><i class="dot"></i>${ST[k]}</span>`).join('')}</div></div>`;
 }
 
-// ---------- список ----------
-async function viewList() {
-  $('main').innerHTML = `
-    <h2 class="text-xl font-bold mb-4">Проблемы</h2>
-    <div class="flex flex-wrap gap-3 mb-4">
-      <select id="fd" class="border rounded px-3 py-2 bg-white"><option value="">Все районы</option>${opts(DISTRICTS)}</select>
-      <select id="fs" class="border rounded px-3 py-2 bg-white"><option value="">Все статусы</option>${opts(STATUSES)}</select>
-    </div>
-    <div id="tbl" class="bg-white rounded-xl shadow overflow-x-auto"></div>`;
-  async function load() {
-    const q = new URLSearchParams();
-    if ($('fd').value) q.set('district', $('fd').value);
-    if ($('fs').value) q.set('status', $('fs').value);
-    $('tbl').innerHTML = '<p class="p-4 text-slate-500">Загрузка…</p>';
-    const rows = await api('/api/problems?' + q);
-    $('tbl').innerHTML = rows.length ? `
-      <table class="w-full text-sm">
-        <thead class="text-left text-slate-500 border-b"><tr>
-          <th class="p-3">№</th><th class="p-3">Тип</th><th class="p-3">Район / адрес</th>
-          <th class="p-3">Статус</th><th class="p-3">👥</th><th class="p-3">Создана</th></tr></thead>
-        <tbody>${rows.map((p) => `
-          <tr class="border-b hover:bg-slate-50 cursor-pointer" onclick="location.hash='#/problems/${p._id}'">
-            <td class="p-3">#${sid(p._id)}</td><td class="p-3">${esc(TYPES[p.type] || p.type)}</td>
-            <td class="p-3">${esc(DISTRICTS[p.district] || p.district)}<div class="text-slate-500">${esc(p.address)}</div></td>
-            <td class="p-3">${badge(p.status)}</td><td class="p-3">${p.confirmCount}</td>
-            <td class="p-3 whitespace-nowrap">${fmt(p.createdAt)}</td></tr>`).join('')}
-        </tbody></table>` : '<p class="p-4 text-slate-500">Проблем не найдено</p>';
-  }
-  const safe = () => load().catch((e) => ($('tbl').innerHTML = errBox(e.message)));
-  $('fd').onchange = safe; $('fs').onchange = safe;
-  await load();
+async function viewList(){
+  $('main').innerHTML=`<h1>Жалобы</h1><div class="filters"><input id="q" placeholder="Поиск по адресу и описанию"><select id="fd"><option value="">Все районы</option>${opts(DISTRICTS)}</select><select id="fs"><option value="">Все статусы</option>${opts(ST)}</select></div><div class="card tw" id="tbl"></div>`;
+  let cache=[];
+  const draw=()=>{const q=$('q').value.trim().toLowerCase();
+    const rows=cache.filter(p=>!q||(p.address+' '+p.description).toLowerCase().includes(q));
+    $('tbl').innerHTML=rows.length?`<table><thead><tr><th>№</th><th>Тип</th><th>Район и адрес</th><th>Статус</th><th>👥</th><th>Дата</th></tr></thead><tbody>${rows.map(p=>`<tr onclick="location.hash='#/problems/${p._id}'"><td class="mut">#${sid(p._id)}</td><td>${esc(TYPES[p.type]||p.type)}</td><td>${esc(DISTRICTS[p.district]||p.district)}<div class="mut sm">${esc(p.address)}</div></td><td>${pill(p.status)}</td><td>${p.confirmCount}</td><td class="mut sm" style="white-space:nowrap">${fmt(p.createdAt)}</td></tr>`).join('')}</tbody></table>`:'<p class="mut" style="padding:20px">Ничего не найдено</p>'};
+  const load=async()=>{const u=new URLSearchParams();if($('fd').value)u.set('district',$('fd').value);if($('fs').value)u.set('status',$('fs').value);
+    $('tbl').innerHTML='<p class="mut" style="padding:20px">Загрузка…</p>';
+    try{cache=await api('/api/problems?'+u);draw()}catch(e){$('tbl').innerHTML=`<p class="err" style="padding:20px">${esc(e.message)}</p>`}};
+  $('q').oninput=draw;$('fd').onchange=load;$('fs').onchange=load;await load();
 }
 
-// ---------- карточка ----------
-async function viewDetail(id) {
-  const p = await api('/api/problems/' + id);
-  const hist = (p.statusHistory || []).slice().reverse().map((h) => `
-    <li class="border-l-2 pl-3 pb-3"><div>${badge(h.status)} <span class="text-xs text-slate-500">${fmt(h.changedAt)}</span></div>
-    ${h.note ? `<div class="text-sm mt-1">💬 ${esc(h.note)}</div>` : ''}</li>`).join('');
-  $('main').innerHTML = `
-    <a href="#/problems" class="text-sm text-slate-500 hover:underline">← К списку</a>
-    <div class="grid md:grid-cols-2 gap-4 mt-3">
-      <section class="bg-white rounded-xl shadow p-4 space-y-2">
-        <h2 class="text-lg font-bold">${esc(TYPES[p.type] || p.type)} <span class="text-slate-400">#${sid(p._id)}</span></h2>
-        <div>${badge(p.status)}</div>
-        <div>📍 ${esc(DISTRICTS[p.district] || p.district)}, ${esc(p.address)}</div>
-        <div class="whitespace-pre-wrap">${esc(p.description)}</div>
-        <div class="text-sm text-slate-500">Автор: ${esc(p.reporterName || '—')} (id ${p.reporterTelegramId})</div>
-        <div class="text-sm text-slate-500">Подтвердили: ${p.confirmCount} · Создана: ${fmt(p.createdAt)}</div>
-        <div id="photo">${p.hasPhoto ? '<p class="text-slate-400 text-sm">Загрузка фото…</p>' : ''}</div>
-      </section>
-      <section class="space-y-4">
-        <form id="sf" class="bg-white rounded-xl shadow p-4 space-y-3">
-          <h3 class="font-bold">Сменить статус</h3>
-          <select id="ns" class="w-full border rounded px-3 py-2 bg-white">${opts(STATUSES, p.status)}</select>
-          <textarea id="nn" maxlength="500" rows="3" class="w-full border rounded px-3 py-2" placeholder="Сообщение жителям (необязательно)"></textarea>
-          <div id="sm"></div>
-          <button class="bg-slate-900 text-white rounded px-4 py-2 text-sm font-medium">Сохранить и уведомить</button>
-          <p class="text-xs text-slate-500">Уведомление получат все, кто сообщал или подтверждал проблемы в этом районе.</p>
-        </form>
-        <div class="bg-white rounded-xl shadow p-4"><h3 class="font-bold mb-3">История</h3><ul>${hist}</ul></div>
-      </section>
-    </div>`;
-  if (p.hasPhoto) {
-    api(`/api/problems/${id}/photo`, {}, true)
-      .then((b) => { $('photo').innerHTML = `<img src="${URL.createObjectURL(b)}" class="rounded-lg max-h-96 mt-2" alt="Фото">`; })
-      .catch((e) => { $('photo').innerHTML = errBox('Фото: ' + e.message); });
-  }
-  $('sf').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button'); btn.disabled = true;
-    try {
-      await api(`/api/problems/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status: $('ns').value, note: $('nn').value }) });
-      await viewDetail(id);
-      $('sm').innerHTML = '<div class="p-3 rounded bg-green-50 text-green-700 text-sm">Сохранено, рассылка жителям запущена</div>';
-    } catch (err) { $('sm').innerHTML = errBox(err.message); btn.disabled = false; }
-  };
+async function viewDetail(id){
+  const p=await api('/api/problems/'+id);
+  const hist=(p.statusHistory||[]).slice().reverse().map(h=>`<li style="--c:var(--c-${h.status})">${pill(h.status)} <span class="mut sm">${fmt(h.changedAt)}</span>${h.note?`<div class="sm" style="margin-top:4px">${esc(h.note)}</div>`:''}</li>`).join('');
+  const del=p.status==='resolved'?'<button type="button" class="btn danger" id="del">Удалить жалобу</button>':'<p class="mut sm" style="margin:0">Удалить можно только решённую жалобу.</p>';
+  $('main').innerHTML=`<a class="back" href="#/problems">← Все жалобы</a><div class="grid g2" style="align-items:start">
+  <div class="card stack"><div style="font-size:18px;font-weight:600">${esc(TYPES[p.type]||p.type)} <span class="mut">#${sid(p._id)}</span></div>${pill(p.status)}
+  <div>📍 ${esc(DISTRICTS[p.district]||p.district)}, ${esc(p.address)}</div><div style="white-space:pre-wrap">${esc(p.description)}</div>
+  <div class="mut sm">Автор: ${esc(p.reporterName||'—')} · Подтвердили: ${p.confirmCount} · ${fmt(p.createdAt)}</div><div id="ph">${p.hasPhoto?'<span class="mut sm">Загрузка фото…</span>':''}</div></div>
+  <div class="stack"><form id="sf" class="card stack"><h3>Сменить статус</h3><select id="ns">${opts(ST,p.status)}</select>
+  <textarea id="nn" rows="3" maxlength="500" placeholder="Сообщение жителям (необязательно)"></textarea><div id="sm"></div>
+  <button class="btn">Сохранить и уведомить</button><p class="mut sm" style="margin:0">Уведомление получат жители этого района, которые сообщали или подтверждали жалобы.</p></form>
+  <div class="card"><h3>История</h3><ul class="hist">${hist}</ul></div><div class="card">${del}<div id="dm"></div></div></div></div>`;
+  if(p.hasPhoto)api(`/api/problems/${id}/photo`,{},true).then(b=>{$('ph').innerHTML=`<img class="ph" src="${URL.createObjectURL(b)}" alt="">`}).catch(e=>{$('ph').innerHTML=`<span class="err">Фото: ${esc(e.message)}</span>`});
+  $('sf').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;
+    try{await api(`/api/problems/${id}/status`,{method:'PATCH',body:JSON.stringify({status:$('ns').value,note:$('nn').value})});await viewDetail(id);$('sm').innerHTML='<div class="ok">Сохранено, жители уведомлены</div>'}
+    catch(x){$('sm').innerHTML=`<div class="err">${esc(x.message)}</div>`;b.disabled=false}};
+  if($('del'))$('del').onclick=async()=>{if(!confirm('Удалить жалобу #'+sid(id)+' навсегда?'))return;
+    try{await api('/api/problems/'+id,{method:'DELETE'});location.hash='#/problems'}catch(x){$('dm').innerHTML=`<div class="err">${esc(x.message)}</div>`}};
 }
 
-// ---------- роутер ----------
-async function route() {
-  if (!getToken()) return viewLogin();
-  shell();
-  const h = location.hash.replace(/^#/, '') || '/';
-  const m = h.match(/^\/problems\/([a-f0-9]{24})$/);
-  try {
-    if (m) await viewDetail(m[1]);
-    else if (h === '/problems') await viewList();
-    else await viewDashboard();
-  } catch (e) { if ($('main')) $('main').innerHTML = errBox(e.message); }
+async function route(){
+  if(!tok())return viewLogin();
+  const h=location.hash.replace(/^#/,'')||'/';shell(h);
+  const m=h.match(/^\/problems\/([a-f0-9]{24})$/);
+  try{if(m)await viewDetail(m[1]);else if(h==='/problems')await viewList();else await viewDashboard()}
+  catch(e){$('main').innerHTML=`<div class="err">${esc(e.message)}</div>`}
 }
-window.addEventListener('hashchange', route);
-route();
+addEventListener('hashchange',route);route();
 </script>
 </body>
 </html>
