@@ -99,5 +99,17 @@ module.exports = function problemsRouter(bot) {
     }
   });
 
+  // DELETE /api/problems/:id — только решённые (admin и moderator)
+  router.delete('/:id', async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ error: 'Неверный id' });
+    const p = await Problem.findById(req.params.id, 'status');
+    if (!p) return res.status(404).json({ error: 'Не найдено' });
+    if (p.status !== 'resolved') {
+      return res.status(409).json({ error: 'Удалять можно только решённые жалобы' });
+    }
+    await p.deleteOne();
+    res.json({ ok: true });
+  });
+
   return router;
 };
